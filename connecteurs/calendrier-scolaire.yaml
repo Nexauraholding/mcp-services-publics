@@ -1,0 +1,37 @@
+description: specs/calendrier-scolaire.original.json
+base: https://data.education.gouv.fr/api/explore/v2.0
+quota:
+  officiel: null
+  client_appels_seconde: 1
+  affichage: quota officiel non communiqué ; cadence locale de 1 appel/seconde.
+  source: https://www.data.gouv.fr/api/1/dataservices/?q=calendrier%20scolaire
+licence: Licence Ouverte 2.0
+licence_source: https://www.data.gouv.fr/datasets/le-calendrier-scolaire
+operations:
+- methode: GET
+  chemin: /catalog/datasets/{dataset_id}/records
+  nom: vacances_scolaires
+  description: 'Consulte les vacances du calendrier scolaire officiel pour ta zone
+    et ton année scolaire. Dans where, écris par exemple : zones = ''Zone A'' AND
+    annee_scolaire = ''2026-2027'' ; tu reçois les périodes et académies, parfois
+    répétées.'
+  chemin_fixe: /catalog/datasets/fr-en-calendrier-scolaire/records
+  retirer_parametres:
+  - dataset_id
+  - select
+  - group_by
+  - order_by
+  - refine
+  - exclude
+  - lang
+  - timezone
+  parametres:
+    where:
+      required: true
+      schema:
+        pattern: ^zones = '[^']+' AND annee_scolaire = '[0-9]{4}-[0-9]{4}'$
+    limit:
+      schema:
+        minimum: 1
+        maximum: 100
+        default: 100

@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nexaura_services_publics"
+version = "0.1.0"
+description = "Huit connecteurs MCP publics en lecture seule"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["fastmcp==2.14.5", "httpx==0.28.1", "PyYAML==6.0.3"]
+
+[project.optional-dependencies]
+test = ["pytest==9.1.1"]
+
+[tool.setuptools]
+packages = ["nexaura_services_publics"]
+include-package-data = true
+
+[tool.setuptools.data-files]
+"share/nexaura_services_publics/connecteurs" = ["connecteurs/*.yaml"]
+"share/nexaura_services_publics/specs" = ["specs/*.json", "specs/*.yml", "specs/*.yaml", "specs/SOURCES.md"]
+
+[tool.pytest.ini_options]
+markers = ["reseau: un appel réel par connecteur, seulement avec BANC_RESEAU=1"]

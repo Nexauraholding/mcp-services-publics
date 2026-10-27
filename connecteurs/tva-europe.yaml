@@ -1,0 +1,40 @@
+description: specs/tva-europe.openapi.yaml
+base: https://ec.europa.eu/taxation_customs/vies/rest-api
+quota:
+  officiel: null
+  client_appels_seconde: 1
+  affichage: quota officiel chiffré non communiqué ; 1 appel/seconde et une requête
+    à la fois ; sur MS_UNAVAILABLE ou MS_MAX_CONCURRENT_REQ, une seule nouvelle tentative
+    après 3 s.
+requete_stricte: true
+une_a_la_fois: true
+reprise:
+  codes:
+  - MS_UNAVAILABLE
+  - MS_MAX_CONCURRENT_REQ
+  delai_secondes: 3
+licence: Conditions VIES et droits des administrations nationales ; aucune licence
+  ouverte uniforme annoncée pour les données
+licence_source: https://ec.europa.eu/taxation_customs/vies/#/disclaimer
+operations:
+- methode: GET
+  chemin: /ms/{countryCode}/vat/{vatNumber}
+  nom: verifier_tva
+  description: 'Vérifie ton numéro de TVA avec countryCode et vatNumber sans le préfixe
+    pays. Pour la France, le nom et l’adresse reviennent souvent vides : tu obtiens
+    surtout « valide » ou « non valide ». Une indisponibilité ne signifie pas « non
+    valide ».'
+  parametres:
+    countryCode:
+      schema:
+        type: string
+        pattern: ^[A-Z]{2}$
+    vatNumber:
+      schema:
+        type: string
+        pattern: ^[A-Z0-9]{2,14}$
+- methode: GET
+  chemin: /check-status
+  nom: etat_service_tva
+  description: Consulte la disponibilité de VIES et des services des pays.
+  parametres: {}

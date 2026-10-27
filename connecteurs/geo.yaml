@@ -1,0 +1,55 @@
+description: specs/geo.converti.openapi.json
+base: https://geo.api.gouv.fr
+quota:
+  officiel: 50 appels / seconde / IP
+  client_appels_seconde: 40
+  affichage: 50 appels/seconde/IP ; ce connecteur se limite à 40 appels/seconde.
+  source: https://www.data.gouv.fr/dataservices/api-decoupage-administratif-api-geo
+licence: Licence Ouverte 2.0 (données administratives INSEE) ; sources géographiques
+  sous licences Open Data
+licence_source: https://geo.api.gouv.fr/decoupage-administratif
+operations:
+- methode: GET
+  chemin: /communes
+  nom: chercher_communes
+  description: 'Cherche avec nom ou codePostal : tu reçois les communes correspondantes.'
+  parametres:
+    format:
+      schema:
+        default: json
+    geometry:
+      schema:
+        default: centre
+- methode: GET
+  chemin: /communes/{code}
+  nom: commune_par_code
+  description: 'Donne un code INSEE : tu reçois les informations de cette commune.'
+  parametres:
+    format:
+      schema:
+        default: json
+    geometry:
+      schema:
+        default: centre
+- methode: GET
+  chemin: /departements
+  nom: departements
+  description: 'Consulte les départements : tu reçois leurs noms et codes.'
+  parametres:
+    format:
+      schema:
+        default: json
+    geometry:
+      schema:
+        default: centre
+- methode: GET
+  chemin: /regions
+  nom: regions
+  description: 'Consulte les régions : tu reçois leurs noms et codes.'
+  parametres:
+    format:
+      schema:
+        default: json
+    geometry:
+      schema:
+        default: centre

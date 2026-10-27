@@ -1,0 +1,72 @@
+description: specs/taux-de-change.openapi.json
+base: https://api.frankfurter.dev/v2
+quota:
+  officiel: null
+  client_appels_seconde: 1
+  affichage: pas de quota journalier ou mensuel annoncé, protection contre les abus
+    ; cadence locale de 1 appel/seconde.
+requete_stricte: true
+licence: Taux agrégés Frankfurter librement utilisables, y compris commercialement
+  ; pas de licence de données distincte nommée (MIT concerne le code)
+licence_source: https://frankfurter.dev/
+operations:
+- methode: GET
+  chemin: /rates
+  nom: taux_de_change
+  description: 'Choisis ta devise de base et obligatoirement les devises cibles dans
+    quotes (séparées par des virgules). Tu reçois les derniers taux disponibles, ou
+    ceux de date : taux de référence indicatif, pas un cours de banque.'
+  retirer_parametres:
+  - from
+  - to
+  - providers
+  - group
+  - expand
+  parametres:
+    base:
+      required: true
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{3}$
+    quotes:
+      required: true
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{3}(,[A-Za-z]{3})*$
+    date:
+      schema:
+        type: string
+        pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+- methode: GET
+  chemin: /rate/{base}/{quote}
+  nom: taux_entre_devises
+  description: 'Choisis tes deux devises et éventuellement date : tu reçois un taux
+    de référence indicatif, pas un cours de banque.'
+  retirer_parametres:
+  - providers
+  parametres:
+    base:
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{3}$
+    quote:
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{3}$
+    date:
+      schema:
+        type: string
+        pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+- methode: GET
+  chemin: /currencies
+  nom: devises_disponibles
+  description: Consulte les devises que tu peux utiliser ; scope=all inclut les anciennes
+    devises.
+  retirer_parametres:
+  - providers
+  parametres:
+    scope:
+      schema:
+        type: string
+        enum:
+        - all

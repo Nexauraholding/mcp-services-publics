@@ -1,0 +1,33 @@
+description: specs/adresse.openapi.yaml
+base: https://data.geopf.fr/geocodage
+quota:
+  officiel: 50 appels / seconde / IP
+  client_appels_seconde: 40
+  affichage: 50 appels/seconde/IP ; ce connecteur se limite à 40 appels/seconde.
+  source: https://cartes.gouv.fr/aide/fr/guides-utilisateur/utiliser-les-services-de-la-geoplateforme/geocodage/
+licence: Licence Ouverte 2.0 (BAN, index address uniquement)
+licence_source: https://adresse.data.gouv.fr/outils/api-doc/adresse
+operations:
+- methode: GET
+  chemin: /search
+  nom: chercher_adresse
+  description: Cherche une adresse avec q et renvoie ses coordonnées et les adresses
+    proposées.
+  parametres:
+    index:
+      schema:
+        type: string
+        enum:
+        - address
+        default: address
+- methode: GET
+  chemin: /reverse
+  nom: adresse_depuis_position
+  description: 'Donne lon et lat : tu reçois les adresses proches de cette position.'
+  parametres:
+    index:
+      schema:
+        type: string
+        enum:
+        - address
+        default: address

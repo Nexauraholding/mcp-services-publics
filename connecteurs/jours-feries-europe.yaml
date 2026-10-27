@@ -1,0 +1,116 @@
+description: specs/jours-feries-europe.openapi.json
+base: https://openholidaysapi.org
+quota:
+  officiel: null
+  client_appels_seconde: 1
+  affichage: quota officiel non communiqué ; cadence locale de 1 appel/seconde.
+requete_stricte: true
+licence: ODbL-1.0 — Données OpenHolidays API (ODbL)
+licence_source: https://github.com/openpotato/openholidaysapi.data
+operations:
+- methode: GET
+  chemin: /PublicHolidays
+  nom: jours_feries
+  description: Choisis countryIsoCode, validFrom et validTo (AAAA-MM-JJ), sur trois
+    ans au maximum ; subdivisionCode est facultatif, languageIsoCode vaut FR par défaut
+    (traduction selon disponibilité). Données OpenHolidays API (ODbL).
+  periode_dates:
+    debut: validFrom
+    fin: validTo
+    maximum_annees: 3
+  retirer_parametres:
+  - groupCode
+  parametres:
+    countryIsoCode:
+      required: true
+      schema:
+        type: string
+        pattern: ^[A-Z]{2}$
+    languageIsoCode:
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{2}$
+        default: FR
+    validFrom:
+      required: true
+      schema:
+        type: string
+        format: date
+        pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+    validTo:
+      required: true
+      schema:
+        type: string
+        format: date
+        pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+    subdivisionCode:
+      schema:
+        type: string
+        minLength: 1
+- methode: GET
+  chemin: /SchoolHolidays
+  nom: vacances_scolaires_europe
+  description: Choisis countryIsoCode, validFrom et validTo (AAAA-MM-JJ), sur trois
+    ans au maximum ; subdivisionCode est facultatif, languageIsoCode vaut FR par défaut
+    (traduction selon disponibilité). Données OpenHolidays API (ODbL).
+  periode_dates:
+    debut: validFrom
+    fin: validTo
+    maximum_annees: 3
+  retirer_parametres:
+  - groupCode
+  parametres:
+    countryIsoCode:
+      required: true
+      schema:
+        type: string
+        pattern: ^[A-Z]{2}$
+    languageIsoCode:
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{2}$
+        default: FR
+    validFrom:
+      required: true
+      schema:
+        type: string
+        format: date
+        pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+    validTo:
+      required: true
+      schema:
+        type: string
+        format: date
+        pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+    subdivisionCode:
+      schema:
+        type: string
+        minLength: 1
+- methode: GET
+  chemin: /Countries
+  nom: pays
+  description: Consulte les pays disponibles ; languageIsoCode vaut FR par défaut
+    (traduction selon disponibilité). Données OpenHolidays API (ODbL).
+  parametres:
+    languageIsoCode:
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{2}$
+        default: FR
+- methode: GET
+  chemin: /Subdivisions
+  nom: regions_du_pays
+  description: Donne countryIsoCode pour consulter les régions pertinentes ; languageIsoCode
+    vaut FR par défaut (traduction selon disponibilité). Données OpenHolidays API
+    (ODbL).
+  parametres:
+    countryIsoCode:
+      required: true
+      schema:
+        type: string
+        pattern: ^[A-Z]{2}$
+    languageIsoCode:
+      schema:
+        type: string
+        pattern: ^[A-Za-z]{2}$
+        default: FR

@@ -1,0 +1,52 @@
+description: specs/bodacc.original.json
+base: https://bodacc-datadila.opendatasoft.com/api/explore/v2.1
+quota:
+  officiel: null
+  client_appels_seconde: 1
+  affichage: quota officiel non communiqué ; 1 appel/seconde, 20 annonces au maximum
+    par appel, tri récent imposé.
+requete_stricte: true
+licence: Licence Ouverte / Open Licence (fr-lo)
+licence_source: https://www.data.gouv.fr/datasets/bodacc
+operations:
+- methode: GET
+  chemin: /catalog/datasets/{dataset_id}/records
+  nom: annonces_entreprise
+  description: 'Consulte les annonces de ton entreprise, de la plus récente à la plus
+    ancienne. Donne un SIREN dans where, par exemple : registre = ''444608442''. Tu
+    reçois au plus 20 annonces ; utilise offset pour la suite.'
+  chemin_fixe: /catalog/datasets/annonces-commerciales/records
+  retirer_parametres:
+  - dataset_id
+  - select
+  - group_by
+  - refine
+  - exclude
+  - lang
+  - timezone
+  - include_links
+  - include_app_metas
+  parametres:
+    where:
+      required: true
+      schema:
+        type: string
+        pattern: ^registre = '[0-9]{9}'$
+    order_by:
+      schema:
+        type: string
+        enum:
+        - dateparution DESC
+        default: dateparution DESC
+    limit:
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 20
+        default: 20
+    offset:
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 9980
+        default: 0

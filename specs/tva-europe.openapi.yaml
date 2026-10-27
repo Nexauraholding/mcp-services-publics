@@ -1,0 +1,65 @@
+openapi: 3.0.3
+info:
+  title: VIES — description NexAura des GET
+  version: '2026-10-27'
+  description: Description écrite par NexAura d’après la documentation officielle
+    VIES. Nom et adresse souvent vides en France ; le verdict est surtout valide ou
+    non valide.
+servers:
+- url: https://ec.europa.eu/taxation_customs/vies/rest-api
+paths:
+  /ms/{countryCode}/vat/{vatNumber}:
+    get:
+      operationId: verifier_tva
+      description: 'Vérifie ton numéro de TVA avec countryCode et vatNumber sans le
+        préfixe pays. Pour la France, le nom et l’adresse reviennent souvent vides
+        : tu obtiens surtout « valide » ou « non valide ». Une indisponibilité ne
+        signifie pas « non valide ».'
+      parameters:
+      - name: countryCode
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Z]{2}$
+      - name: vatNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Z0-9]{2,14}$
+      responses:
+        '200':
+          description: Réponse VIES JSON ; isValid est un booléen (GET) pour une vérification
+            réussie. Les erreurs ne sont pas un verdict.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: Requête invalide
+        '403':
+          description: Service indisponible ou limite atteinte ; erreur JSON
+        '500':
+          description: Erreur VIES
+  /check-status:
+    get:
+      operationId: etat_service_tva
+      description: Consulte la disponibilité de VIES et des services des pays.
+      parameters: []
+      responses:
+        '200':
+          description: Disponibilité de VIES dans vow.available et des services nationaux
+            dans countries.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: Requête invalide
+        '403':
+          description: Service indisponible ou limite atteinte ; erreur JSON
+        '500':
+          description: Erreur VIES

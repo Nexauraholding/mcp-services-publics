@@ -1,0 +1,15 @@
+description: specs/jours-feries.openapi.yml
+base: https://calendrier.api.gouv.fr/jours-feries/
+quota:
+  officiel: null
+  client_appels_seconde: 1
+  affichage: quota officiel non communiqué ; cadence locale de 1 appel/seconde.
+  source: https://www.data.gouv.fr/api/1/dataservices/?q=jours%20f%C3%A9ri%C3%A9s
+licence: Licence Ouverte 2.0
+licence_source: https://www.data.gouv.fr/datasets/jours-feries-en-france
+operations:
+- methode: GET
+  chemin: /{zone}/{annee}.json
+  nom: jours_feries
+  description: 'Choisis une zone et une année : tu reçois les dates et les noms des
+    jours fériés.'
