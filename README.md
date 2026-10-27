@@ -30,6 +30,8 @@ Aucune description n'est téléchargée au démarrage. Les fichiers `specs/` et 
 
 ## Outils disponibles
 
+Chaque outil se déclare en lecture seule (readOnlyHint).
+
 ### adresse
 
 | Outil | Ce qu’il fait | Limite |

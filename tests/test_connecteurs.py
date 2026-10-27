@@ -8,7 +8,7 @@ import httpx
 import pytest
 from fastmcp import Client
 from nexaura_services_publics import (
-    NOMS, RACINE, MAX_OCTETS, USER_AGENT, ClientPublic, Limiteur,
+    NOMS, RACINE, MAX_OCTETS, TITRES, USER_AGENT, ClientPublic, Limiteur,
     charger, configuration, fabriquer,
 )
 
@@ -36,6 +36,25 @@ def test_outils_exacts_et_origine_get(nom):
                 assert t.output_schema is None
         finally:
             await s.client_public.aclose()
+    run(scenario())
+
+
+@pytest.mark.parametrize('nom', NOMS)
+def test_annotations_lecture_seule(nom):
+    async def scenario():
+        server = fabriquer(nom)
+        async with Client(server) as client:
+            tools = await client.list_tools()
+            assert {tool.name for tool in tools} == {
+                op['nom'] for op in configuration(nom)['operations']
+            }
+            for tool in tools:
+                assert tool.annotations is not None
+                assert tool.annotations.title == TITRES[tool.name]
+                assert tool.annotations.readOnlyHint is True
+                assert tool.annotations.destructiveHint is False
+                assert tool.annotations.idempotentHint is True
+                assert tool.annotations.openWorldHint is True
     run(scenario())
 
 

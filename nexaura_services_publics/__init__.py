@@ -16,11 +16,31 @@ import httpx
 import yaml
 from fastmcp import FastMCP
 from fastmcp.server.openapi import MCPType, RouteMap
+from mcp.types import ToolAnnotations
 
 NOMS = ("adresse", "geo", "jours-feries", "calendrier-scolaire",
         "bodacc", "tva-europe", "jours-feries-europe", "taux-de-change")
+TITRES = {
+    "chercher_adresse": "Chercher une adresse",
+    "adresse_depuis_position": "Chercher une adresse depuis une position",
+    "chercher_communes": "Chercher des communes",
+    "commune_par_code": "Consulter une commune par son code",
+    "departements": "Consulter les départements",
+    "regions": "Consulter les régions",
+    "jours_feries": "Consulter les jours fériés",
+    "vacances_scolaires": "Consulter les vacances scolaires",
+    "annonces_entreprise": "Consulter les annonces d'une entreprise",
+    "verifier_tva": "Vérifier un numéro de TVA",
+    "etat_service_tva": "Consulter la disponibilité du service TVA",
+    "vacances_scolaires_europe": "Consulter les vacances scolaires en Europe",
+    "pays": "Consulter les pays disponibles",
+    "regions_du_pays": "Consulter les régions d'un pays",
+    "taux_de_change": "Consulter les taux de change",
+    "taux_entre_devises": "Consulter le taux entre deux devises",
+    "devises_disponibles": "Consulter les devises disponibles",
+}
 MAX_OCTETS = 200_000  # 200 Ko décimaux, contenu décompressé
-USER_AGENT = "NexAura-services-publics/0.1 (lecture seule)"
+USER_AGENT = "NexAura-services-publics/0.1.1 (lecture seule)"
 RACINE = Path(__file__).resolve().parent.parent
 if not (RACINE / "connecteurs").is_dir():
     RACINE = Path(sysconfig.get_path("data")) / "share/nexaura_services_publics"
@@ -250,6 +270,11 @@ def fabriquer(nom, *, spec=None, config=None, transport=None):
 
     def adapter(_route, composant):
         composant.output_schema = None
+        composant.annotations = ToolAnnotations(
+            title=TITRES[composant.name],
+            readOnlyHint=True, destructiveHint=False,
+            idempotentHint=True, openWorldHint=True,
+        )
 
     server = FastMCP.from_openapi(openapi_spec=spec, client=client, name=nom,
         route_maps=maps, mcp_component_fn=adapter, lifespan=duree_de_vie)
