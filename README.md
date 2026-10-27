@@ -7,13 +7,28 @@ Tu peux consulter huit API publiques françaises et internationales, sans clé. 
 Depuis ce dossier, avec Python 3.11 ou plus récent :
 
 ```sh
-python3 -m venv .venv
-.venv/bin/pip install -e '.[test]'
+python3 -m venv .venv && .venv/bin/pip install --require-hashes -r requirements.lock && .venv/bin/pip install --no-deps --no-build-isolation .
 .venv/bin/python -m nexaura_services_publics adresse
 ```
 
 Remplace `adresse` par le nom d’un connecteur du tableau ci-dessous. Le serveur échange par l'entrée et la sortie standard ; ses messages techniques restent sur la sortie d'erreur.
 Aucune description n'est téléchargée au démarrage. Les fichiers `specs/` et `connecteurs/` sont inclus dans la distribution Python.
+
+### Verrou des dépendances
+
+Version **0.1.2** : les dépendances d'exécution, directes et transitives, sont figées avec leurs empreintes SHA-256 dans `requirements.lock`. Le verrou inclut aussi `setuptools` et `wheel`, décrits dans `requirements-build.in`. Seules les roues binaires sont acceptées : aucune compilation de dépendance ne peut télécharger d'autres outils.
+
+L'option `--no-deps` empêche la résolution des dépendances du paquet local ; `--no-build-isolation` empêche pip de télécharger des outils de construction dans un environnement séparé. **Les deux sont nécessaires.** Après le clonage, choisir le commit approuvé avant d'exécuter ces commandes ; ne pas installer depuis une branche mouvante. Le verrou protège les téléchargements, pas l'authenticité du dépôt ou du commit choisi.
+
+Pour régénérer depuis ce dossier avec l'outil libre [uv](https://docs.astral.sh/uv/) (version utilisée : 0.12.13) :
+
+```sh
+uv pip compile pyproject.toml requirements-build.in --universal --generate-hashes --python-version 3.11 --only-binary=:all: --emit-build-options -o requirements.lock
+```
+
+Cette commande conserve les versions déjà verrouillées. Pour les mettre à jour volontairement, ajouter `--upgrade`, reporter les versions directes avec `==` dans `pyproject.toml`, puis régénérer et vérifier le changement. Examiner les différences avant de publier le nouveau commit.
+
+Le verrou est résolu avec les marqueurs de plateforme et de version Python. Les empreintes ont été comparées aux fichiers publiés sur PyPI : toutes les empreintes de chaque version sont présentes, y compris les roues compatibles CPython 3.11, 3.12 et 3.13 sur Linux x86_64 (glibc, manylinux jusqu'à 2.28) et macOS arm64 (macOS 14). Ce contrôle des fichiers ne remplace pas une exécution sur ces machines. Alpine/musl, Windows et les autres architectures ne sont pas validés.
 
 ## Les huit connecteurs
 
@@ -185,13 +200,17 @@ Si tu veux deux champs simples `zone` et `annee_scolaire`, il faut soit une desc
 - Aucun schéma de sortie MCP : les descriptions publiques sont imprécises. Les réponses JSON sont conservées, y compris les valeurs nulles. FastMCP enveloppe les tableaux HTTP dans `result.data["result"]` côté client Python.
 - Normalisations de syntaxe avant fabrication : codes HTTP YAML numériques convertis en chaînes ; le type non standard `any` de la description Éducation devient un schéma libre `{}`. Les originaux restent intacts. Geo, fourni en Swagger 2.0, a été converti avec **swagger2openapi 7.0.8** ; Éducation est déjà en **OpenAPI 3.0.3**.
 - Tests réels : seule la zone A 2026-2027 a été vérifiée pour le calendrier scolaire ; Corse et outre-mer ne sont pas vérifiés. Les réponses dépendent de la disponibilité et des données de chaque éditeur.
-- Deux avertissements de dépréciation Authlib peuvent apparaître avec les dépendances transitives actuelles ; les trois dépendances directes sont épinglées, les transitives ne sont pas verrouillées.
+- Deux avertissements de dépréciation Authlib peuvent apparaître avec les dépendances transitives actuelles ; les dépendances directes et transitives sont désormais verrouillées avec leurs empreintes.
 
 Les URL, dates, empreintes et commandes de conversion sont dans [specs/SOURCES.md](specs/SOURCES.md). Le code est sous [licence MIT](LICENSE), les données gardent leur propre licence.
 
 ## Vérifier
 
+Les outils de test sont séparés du verrou d'installation :
+
 ```sh
+uv pip compile pyproject.toml --extra test --constraint requirements.lock --generate-hashes -o /tmp/services-publics-tests.lock
+.venv/bin/pip install --require-hashes -r /tmp/services-publics-tests.lock
 .venv/bin/python -m pytest -q
 BANC_RESEAU=1 .venv/bin/python -m pytest -q -m reseau
 ```
@@ -205,3 +224,5 @@ BANC_RESEAU=1 .venv/bin/python -m pytest -q -m reseau -k europe
 ```
 
 Le cas réseau TVA porte l’identifiant `vies` pour que ce filtre ne contacte qu’OpenHolidays.
+
+Vérification 0.1.2 (27 octobre 2026), copies et environnements neufs hors du dépôt, macOS arm64 : installation avec empreintes, construction locale sans réseau et `pip check` réussis sous Python 3.11.15 et 3.14.6. `python -m pytest -q` : **101 réussis, 8 ignorés, 2 avertissements Authlib**, pour chacun. Les huit appels réels sont ignorés (`BANC_RESEAU=0`). Python 3.12/3.13 et Linux n'ont pas été exécutés ; leurs roues et empreintes ont été contrôlées.

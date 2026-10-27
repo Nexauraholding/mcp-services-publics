@@ -40,7 +40,7 @@ TITRES = {
     "devises_disponibles": "Consulter les devises disponibles",
 }
 MAX_OCTETS = 200_000  # 200 Ko décimaux, contenu décompressé
-USER_AGENT = "NexAura-services-publics/0.1.1 (lecture seule)"
+USER_AGENT = "NexAura-services-publics/0.1.2 (lecture seule)"
 RACINE = Path(__file__).resolve().parent.parent
 if not (RACINE / "connecteurs").is_dir():
     RACINE = Path(sysconfig.get_path("data")) / "share/nexaura_services_publics"
